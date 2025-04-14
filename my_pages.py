@@ -3,14 +3,14 @@ import pickle
 import my_funcs as fn
 
 
-df=pd.read_csv('df.csv')
-df_RFM=pd.read_csv('df_now.csv')
-df_RFM_TapLuat=pd.read_csv('df_RFM_TapLuat.csv')
+df=pd.read_csv('files/df.csv')
+df_RFM=pd.read_csv('files/df_now.csv')
+df_RFM_TapLuat=pd.read_csv('files/df_RFM_TapLuat.csv')
 df_now=df_RFM.copy()
-scaled_data=pd.read_csv('scaled_data.csv')
+scaled_data=pd.read_csv('files/scaled_data.csv')
 
-model = pickle.load(open('customer_segmentation_model.sav', 'rb'))
-gmm_model=pickle.load(open('gmm_model.pkl', 'rb'))
+model = pickle.load(open('models/customer_segmentation_model.sav', 'rb'))
+gmm_model=pickle.load(open('models/gmm_model.pkl', 'rb'))
 
 df_now=fn.gan_nhan_cum_cho_khach_hang(df_now,model)
 rfm_agg2=fn.tinh_gia_tri_tb_RFM(df_now)
@@ -88,17 +88,19 @@ def lua_chon_ket_qua(st):
 
 # -----------------------------------------------------------------------------------
 def ung_dung_phan_nhom(st):
-    st.write('### Dự đoán phân nhóm khách hàng 💡')      
-    status = st.radio("**Chọn cách nhập thông tin khách hàng:**", ("Nhập id khách hàng là thành viên của cửa hàng:", "Nhập RFM của khách hàng:","Upload file:"))
+    st.write("### 📈Dự đoán và Phân nhóm Khách hàng")
+    # st.write('### Dự đoán phân nhóm khách hàng 💡')      
+    status = st.radio("**Chọn cách nhập thông tin khách hàng:**", ("🆔Nhập id khách hàng là thành viên của cửa hàng:", "📊Nhập RFM của khách hàng:","⬆️Upload file:"))
     st.write(f'**{status}**')
-    if status=="Nhập id khách hàng là thành viên của cửa hàng:":
+    if status=="🆔Nhập id khách hàng là thành viên của cửa hàng:":
         selected_cus=fn.select_one_customers_by_id(customers,df_merged,False,st)
-    elif status=='Nhập RFM của khách hàng:':        
+    elif status=='📊Nhập RFM của khách hàng:':        
         fn.select_one_customers_by_RFM(df_merged,model,st)
-    elif status=='Upload file:':
-        st.subheader("File Uploader")
+    elif status=='⬆️Upload file:':           
+        st.write("##### ⬇️Download file mẫu tại đây:")        
+        fn.download_file(st,'files/file_mau.csv')    
+        st.write("##### ⬆️Upload file để phân nhóm tại đây:")        
         fn.upload_customers_file(st,model)
-
 
 # ===================================================================================
 if __name__ == "__main__":

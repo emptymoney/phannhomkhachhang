@@ -129,18 +129,32 @@ def select_one_customers_by_id(customer_id_list,df,isRandomCus,st):
             st.markdown(format_table(selected_cus).to_html(), unsafe_allow_html=True)    
             giai_thich_ClusterName(st,selected_cus['ClusterName'].iloc[0])
 
-
+def download_file(st,file_path):
+    with open(file_path, "r") as file:
+        csv_data = file.read()
+    st.download_button(
+        label="Tải xuống tệp CSV mẫu",
+        data=csv_data,
+        file_name="file_mau.csv",
+        mime="text/csv"
+    )
 # -----------------------------------------------------------------------------------            
 def upload_customers_file(st,model):
     file = st.file_uploader("Chọn file", type=["csv", "txt"])
+
     if file is not None:
-        cus_random = pd.read_csv(file)
+        cus_random = pd.read_csv(file)      
+        st.write('#### Nội dung file upload')  
+        st.markdown(format_table(cus_random).to_html(), unsafe_allow_html=True)        
         cus_random_temp=cus_random.copy()            
         cus_random_temp = cus_random_temp.drop(columns=['Member_number'])
-        cus_random_temp=gan_nhan_cum_cho_khach_hang(cus_random_temp,model,True)
-        cus_random=cus_random.merge(cus_random_temp,how='left')
-        st.subheader('Bảng phân nhóm danh sách khách hàng 🎉')
-        st.markdown(format_table(cus_random).to_html(), unsafe_allow_html=True)
+        
+        submitted = st.button("Thực hiện phân nhóm")
+        if submitted:
+            cus_random_temp=gan_nhan_cum_cho_khach_hang(cus_random_temp,model,True)
+            cus_random=cus_random.merge(cus_random_temp,how='left')
+            st.subheader('Bảng phân nhóm danh sách khách hàng 🎉')
+            st.markdown(format_table(cus_random).to_html(), unsafe_allow_html=True)
     else:
         st.write("Vui lòng chọn file.")   
 
